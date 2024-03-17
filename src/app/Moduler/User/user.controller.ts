@@ -4,7 +4,7 @@ import catchAsync from "../../utility/trycatch";
 import { userService } from "./user.service";
 
 const createAdmin = catchAsync(async (req, res) => {
-    const result = await userService.createAdminIntoDB()
+    const result = await userService.createAdminIntoDB(req.body)
 
     sendRespone(res, {
         statusCode: httpStatus.CREATED,
