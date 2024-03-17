@@ -22,6 +22,20 @@ const getAdminFromDB = async (params: any) => {
 
         })
     }
+    if (Object.keys(rest).length > 0) {
+        andCondition.push({
+            OR: Object.keys(rest).map(field => (
+                {
+                    [field]: {
+                        equals: rest[field],
+                        mode: 'insensitive'
+                    }
+                }
+            ))
+
+        })
+    }
+
     const whereCondition: Prisma.AdminWhereInput = { AND: andCondition }
     const result = await prisma.admin.findMany({
         where: whereCondition
