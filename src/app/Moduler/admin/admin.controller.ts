@@ -2,9 +2,14 @@ import httpStatus from "http-status";
 import sendRespone from "../../utility/sendResponse";
 import catchAsync from "../../utility/trycatch";
 import { adminService } from "./admin.service";
+import pick from "../../utility/pick";
+
 
 const getAdmin = catchAsync(async (req, res) => {
-    const result = await adminService.getAdminFromDB(req.query)
+
+    const filter = pick(req.query, ['name', 'email', 'contactNumber', 'searchTerm'])
+
+    const result = await adminService.getAdminFromDB(filter)
 
     sendRespone(res, {
         statusCode: httpStatus.OK,

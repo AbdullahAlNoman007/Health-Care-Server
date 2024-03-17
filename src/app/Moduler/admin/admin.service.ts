@@ -5,6 +5,8 @@ import { Prisma, PrismaClient } from "@prisma/client"
 const prisma = new PrismaClient()
 
 const getAdminFromDB = async (params: any) => {
+    console.log(params);
+
     const { searchTerm, ...rest } = params
     const andCondition: Prisma.AdminWhereInput[] = []
     const searchFields = ['name', 'email', 'contactNumber']
