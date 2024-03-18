@@ -1,9 +1,10 @@
-import { PrismaClient, UserRole } from "@prisma/client";
+import { UserRole } from "@prisma/client";
 import { Tadmin } from "./user.interface";
 import bcrypt from 'bcrypt'
+import prisma from "../../utility/prismaClient";
 
 
-const prisma = new PrismaClient()
+
 
 const createAdminIntoDB = async (payload: Tadmin) => {
 
