@@ -22,7 +22,33 @@ const getAdmin = catchAsync(async (req, res) => {
 
     })
 })
+const getAdminById = catchAsync(async (req, res) => {
+
+    const result = await adminService.getAdminByIdFromDB(req.params.id)
+
+    sendRespone(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Admin data is retrived successfully',
+        data: result
+    })
+})
+const updateAdmin = catchAsync(async (req, res) => {
+
+    const result = await adminService.updateAdminIntoDB(req.params.id, req.body)
+
+    sendRespone(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Admin data is updated successfully',
+        data: result
+    })
+})
+
+
 
 export const adminController = {
-    getAdmin
+    getAdmin,
+    getAdminById,
+    updateAdmin
 }

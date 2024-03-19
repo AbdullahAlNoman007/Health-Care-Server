@@ -1,17 +1,16 @@
-import { Prisma } from "@prisma/client"
+import { Admin, Prisma } from "@prisma/client"
 import { adminSearchFields } from "./admin.const";
 import calculatePagination from "../../utility/pagination";
 import prisma from "../../utility/prismaClient";
-
-
-
 
 const getAdminFromDB = async (params: any, options: any) => {
 
     const { limit, orderBy, orderSort, skip, page } = calculatePagination(options)
     const { searchTerm, ...rest } = params
     const andCondition: Prisma.AdminWhereInput[] = []
-
+    andCondition.push({
+        isDeleted: false
+    })
     if (searchTerm) {
         andCondition.push({
             OR: adminSearchFields.map(field => (
@@ -61,9 +60,39 @@ const getAdminFromDB = async (params: any, options: any) => {
     }
 
 }
+const getAdminByIdFromDB = async (id: string) => {
+
+    const result = await prisma.admin.findMany({
+        where: {
+            id: id,
+            isDeleted: false
+        }
+    })
+
+    return result
+}
+const updateAdminIntoDB = async (id: string, payload: Partial<Admin>) => {
+    await prisma.admin.findUniqueOrThrow({
+        where: {
+            id: id,
+            isDeleted: false
+        }
+    })
+
+    const result = await prisma.admin.update({
+        where: {
+            id: id
+        },
+        data: payload
+    })
+
+    return result
+}
 
 
 
 export const adminService = {
-    getAdminFromDB
+    getAdminFromDB,
+    getAdminByIdFromDB,
+    updateAdminIntoDB
 }
