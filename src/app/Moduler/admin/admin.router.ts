@@ -8,5 +8,6 @@ const router = express.Router()
 router.get('/get-admin', adminController.getAdmin)
 router.get('/get-admin/:id', adminController.getAdminById)
 router.patch('/update-admin/:id', validateRequest(adminUpdateValidation), adminController.updateAdmin)
+router.delete('/delete-admin/:id', adminController.deleteAdmin)
 
 export const adminRouter = router;
