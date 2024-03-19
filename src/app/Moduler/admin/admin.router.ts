@@ -9,5 +9,6 @@ router.get('/get-admin', adminController.getAdmin)
 router.get('/get-admin/:id', adminController.getAdminById)
 router.patch('/update-admin/:id', validateRequest(adminUpdateValidation), adminController.updateAdmin)
 router.delete('/delete-admin/:id', adminController.deleteAdmin)
+router.delete('/soft-delete-admin/:id', adminController.softdeleteAdmin)
 
 export const adminRouter = router;
