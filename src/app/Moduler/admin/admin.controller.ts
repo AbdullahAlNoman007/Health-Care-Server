@@ -17,7 +17,8 @@ const getAdmin = catchAsync(async (req, res) => {
         statusCode: httpStatus.OK,
         success: true,
         message: 'Admin data is retrived successfully',
-        data: result
+        meta: result?.meta,
+        data: result.data
 
     })
 })

@@ -2,11 +2,9 @@ import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
 import { TerrorSource } from "../interface/ErrorSource";
 import { ZodError } from "zod";
 import handleZodError from "../Error/zodError";
-import handleValidationError from "../Error/validationError";
-import handleCastError from "../Error/CastError";
-import handleDuplicateError from "../Error/duplicateError";
 import AppError from "../Error/AppError";
 import { Prisma } from "@prisma/client";
+import handlePrismaValidationError from "../Error/PrismaValidationError";
 
 const globalErrorHandle: ErrorRequestHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
 
@@ -23,24 +21,6 @@ const globalErrorHandle: ErrorRequestHandler = (err: any, req: Request, res: Res
         statusCode = simpleError.statusCode;
         errorSource = simpleError.errorSource;
         Message = 'It is a Zod validation Error'
-    }
-    else if (err.name === 'ValidationError') {
-        const simpleError = handleValidationError(err);
-        statusCode = simpleError.statusCode;
-        errorSource = simpleError.errorSource;
-        Message = 'It is a Schema validation Error'
-    }
-    else if (err.name === 'CastError') {
-        const simpleError = handleCastError(err);
-        statusCode = simpleError.statusCode;
-        errorSource = simpleError.errorSource;
-        Message = 'It is a Cast Error'
-    }
-    else if (err.code === 11000) {
-        const simpleError = handleDuplicateError(err);
-        statusCode = simpleError.statusCode;
-        errorSource = simpleError.errorSource;
-        Message = 'It is a duplicate Error'
     }
     else if (err instanceof AppError) {
         statusCode = err?.statusCode;
@@ -62,83 +42,10 @@ const globalErrorHandle: ErrorRequestHandler = (err: any, req: Request, res: Res
         ]
     }
     if (err instanceof Prisma.PrismaClientValidationError) {
-        statusCode = 500;
-        Message = err.name;
-        const errorMessage = err.message;
-        const start_index = errorMessage.indexOf("Unknown argument");
-        const end_index = errorMessage.indexOf("?", start_index) + 1;
-        const extractedMessage = start_index !== -1 && end_index !== -1 ? errorMessage.substring(start_index, end_index).trim() : "Error message not found";
-
-        errorSource = [
-            {
-                path: '',
-                message: extractedMessage
-            }
-        ];
-
-    }
-    if (err instanceof Prisma.PrismaClientInitializationError) {
-        statusCode = 500;
-        Message = err.name;
-        const errorMessage = err.message;
-        const start_index = errorMessage.indexOf("Unknown argument");
-        const end_index = errorMessage.indexOf("?", start_index) + 1;
-        const extractedMessage = start_index !== -1 && end_index !== -1 ? errorMessage.substring(start_index, end_index).trim() : "Error message not found";
-
-        errorSource = [
-            {
-                path: '',
-                message: extractedMessage
-            }
-        ];
-
-    }
-    if (err instanceof Prisma.PrismaClientKnownRequestError) {
-        statusCode = 500;
-        Message = err.name;
-        const errorMessage = err.message;
-        const start_index = errorMessage.indexOf("Unknown argument");
-        const end_index = errorMessage.indexOf("?", start_index) + 1;
-        const extractedMessage = start_index !== -1 && end_index !== -1 ? errorMessage.substring(start_index, end_index).trim() : "Error message not found";
-
-        errorSource = [
-            {
-                path: '',
-                message: extractedMessage
-            }
-        ];
-
-    }
-    if (err instanceof Prisma.PrismaClientRustPanicError) {
-        statusCode = 500;
-        Message = err.name;
-        const errorMessage = err.message;
-        const start_index = errorMessage.indexOf("Unknown argument");
-        const end_index = errorMessage.indexOf("?", start_index) + 1;
-        const extractedMessage = start_index !== -1 && end_index !== -1 ? errorMessage.substring(start_index, end_index).trim() : "Error message not found";
-
-        errorSource = [
-            {
-                path: '',
-                message: extractedMessage
-            }
-        ];
-
-    }
-    if (err instanceof Prisma.PrismaClientUnknownRequestError) {
-        statusCode = 500;
-        Message = err.name;
-        const errorMessage = err.message;
-        const start_index = errorMessage.indexOf("Unknown argument");
-        const end_index = errorMessage.indexOf("?", start_index) + 1;
-        const extractedMessage = start_index !== -1 && end_index !== -1 ? errorMessage.substring(start_index, end_index).trim() : "Error message not found";
-
-        errorSource = [
-            {
-                path: '',
-                message: extractedMessage
-            }
-        ];
+        const simpleError = handlePrismaValidationError(err);
+        statusCode = simpleError.statusCode;
+        errorSource = simpleError.errorSource;
+        Message = simpleError.Message;
 
     }
 
