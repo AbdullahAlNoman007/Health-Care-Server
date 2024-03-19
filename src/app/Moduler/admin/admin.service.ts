@@ -52,6 +52,8 @@ const getAdminFromDB = async (params: any, options: any) => {
 
 }
 
+
+
 export const adminService = {
     getAdminFromDB
 }
