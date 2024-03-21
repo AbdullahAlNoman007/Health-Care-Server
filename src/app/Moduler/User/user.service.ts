@@ -2,13 +2,14 @@ import { UserRole } from "@prisma/client";
 import { Tadmin } from "./user.interface";
 import bcrypt from 'bcrypt'
 import prisma from "../../utility/prismaClient";
+import config from "../../config";
 
 
 
 
 const createAdminIntoDB = async (payload: Tadmin) => {
 
-    const hashPassword = await bcrypt.hash(payload.password, 12)
+    const hashPassword = await bcrypt.hash(payload.password, config.salt_round as string)
 
     const userData = {
         email: payload.admin.email,

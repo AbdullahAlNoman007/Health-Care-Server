@@ -3,8 +3,6 @@ import { adminSearchFields } from "./admin.const";
 import calculatePagination from "../../utility/pagination";
 import prisma from "../../utility/prismaClient";
 import { TadminData } from "./admin.interface";
-import { Tpagination } from "../../interface";
-
 
 const getAdminFromDB = async (params: TadminData, options: any) => {
     console.log(params);
