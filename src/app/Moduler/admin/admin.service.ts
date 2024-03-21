@@ -2,8 +2,13 @@ import { Admin, Prisma } from "@prisma/client"
 import { adminSearchFields } from "./admin.const";
 import calculatePagination from "../../utility/pagination";
 import prisma from "../../utility/prismaClient";
+import { TadminData } from "./admin.interface";
+import { Tpagination } from "../../interface";
 
-const getAdminFromDB = async (params: any, options: any) => {
+
+const getAdminFromDB = async (params: TadminData, options: any) => {
+    console.log(params);
+    console.log(options);
 
     const { limit, orderBy, orderSort, skip, page } = calculatePagination(options)
     const { searchTerm, ...rest } = params
@@ -29,7 +34,7 @@ const getAdminFromDB = async (params: any, options: any) => {
             OR: Object.keys(rest).map(field => (
                 {
                     [field]: {
-                        equals: rest[field],
+                        equals: (rest as any)[field],
                         mode: 'insensitive'
                     }
                 }
