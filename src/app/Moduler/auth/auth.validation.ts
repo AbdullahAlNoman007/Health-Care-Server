@@ -17,3 +17,9 @@ export const forgetpasswordValidation = z.object({
         email: z.string()
     })
 })
+export const resetPasswordValidation = z.object({
+    body: z.object({
+        id: z.string(),
+        password: z.string()
+    })
+})

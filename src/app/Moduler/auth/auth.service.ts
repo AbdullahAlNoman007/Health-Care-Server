@@ -146,9 +146,45 @@ const forgetPassword = async (payload: { email: string }) => {
 
 }
 
+const resetPassword = async (token: string, payload: { id: string, password: string }) => {
+    const userData = await prisma.user.findUniqueOrThrow({
+        where: {
+            id: payload.id,
+            status: 'ACTIVE'
+        }
+    })
+    const decoded = await jwtDecode(token) as TdecodedData
+
+    if ((userData.email !== decoded.email && userData.role !== decoded.role && userData.id !== payload.id)) {
+        throw new AppError(httpStatus.FORBIDDEN, "Provied Valid Data")
+    }
+
+    const hashPassword = await bcrypt.hash(payload.password, config.salt_round as string)
+
+    const resetPassword = await prisma.user.update({
+        where: {
+            id: payload.id,
+            email: userData.email,
+            status: 'ACTIVE'
+        },
+        data: {
+            password: hashPassword,
+            needPasswordChange: false
+        }
+    })
+
+    if (!resetPassword) {
+        throw new AppError(httpStatus.FORBIDDEN, "Fail to reset Password")
+    }
+    return {
+        message: "Password is Reset"
+    }
+}
+
 export const authService = {
     loginInDB,
     refreshToken,
     changePassword,
-    forgetPassword
+    forgetPassword,
+    resetPassword
 }
