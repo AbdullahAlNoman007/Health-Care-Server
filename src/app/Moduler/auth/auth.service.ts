@@ -3,10 +3,11 @@ import AppError from "../../Error/AppError"
 import prisma from "../../utility/prismaClient"
 import { Tlogin } from "./auth.interface"
 import bcrypt from 'bcrypt'
-import token from "../../utility/Token"
 import config from "../../config"
 import { jwtDecode } from "jwt-decode"
 import { TdecodedData } from "../../interface"
+import token from "../../utility/Token"
+import sendEmail from "../../utility/sendEmail"
 
 const loginInDB = async (payload: Tlogin) => {
     const isUserExists = await prisma.user.findUniqueOrThrow({
@@ -107,8 +108,47 @@ const changePassword = async (decoded: TdecodedData, payload: { oldPassword: str
 
 }
 
+const forgetPassword = async (payload: { email: string }) => {
+    const userData = await prisma.user.findUniqueOrThrow({
+        where: {
+            email: payload.email,
+            status: 'ACTIVE'
+        }
+    })
+    const jwtPayload = {
+        email: userData?.email,
+        role: userData?.role
+    }
+    const resetToken = token(jwtPayload, config.jwt_access_token as string, '5m')
+
+    const resetPassLink = config.reset_pass_link + `?userId=${userData?.id}&token=${resetToken}`
+
+    await sendEmail(
+        userData.email,
+        `
+        <div>
+            <p>Dear User</p>
+            <p>Your password reset link 
+                <a href=${resetPassLink}>
+                    <button>
+                        Reset Password
+                    </button>
+                </a>
+            </p>
+
+        </div>
+        `
+    )
+    return {
+        message: "Reset Link is Sended"
+    }
+
+
+}
+
 export const authService = {
     loginInDB,
     refreshToken,
-    changePassword
+    changePassword,
+    forgetPassword
 }
