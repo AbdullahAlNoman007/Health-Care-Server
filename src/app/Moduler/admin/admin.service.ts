@@ -5,9 +5,6 @@ import prisma from "../../utility/prismaClient";
 import { TadminData } from "./admin.interface";
 
 const getAdminFromDB = async (params: TadminData, options: any) => {
-    console.log(params);
-    console.log(options);
-
     const { limit, orderBy, orderSort, skip, page } = calculatePagination(options)
     const { searchTerm, ...rest } = params
     const andCondition: Prisma.AdminWhereInput[] = []
