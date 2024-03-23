@@ -1,11 +1,12 @@
 import httpStatus from "http-status"
 import AppError from "../../Error/AppError"
 import prisma from "../../utility/prismaClient"
-import { TdecodedData, Tlogin } from "./auth.interface"
+import { Tlogin } from "./auth.interface"
 import bcrypt from 'bcrypt'
 import token from "../../utility/Token"
 import config from "../../config"
 import { jwtDecode } from "jwt-decode"
+import { TdecodedData } from "../../interface"
 
 const loginInDB = async (payload: Tlogin) => {
     const isUserExists = await prisma.user.findUniqueOrThrow({
@@ -68,7 +69,46 @@ const refreshToken = async (payload: { refreshToken: string }) => {
 
 }
 
+const changePassword = async (decoded: TdecodedData, payload: { oldPassword: string; newPassword: string }) => {
+    console.log(decoded);
+    console.log(payload);
+
+    const userData = await prisma.user.findUnique({
+        where: {
+            email: decoded.email,
+            status: 'ACTIVE'
+        }
+    })
+
+    const checkPassword = bcrypt.compareSync(payload.oldPassword, userData?.password as string)
+
+    if (!checkPassword) {
+        throw new AppError(httpStatus.BAD_REQUEST, "Old password doesn't matched")
+    }
+
+    const hashPassword = await bcrypt.hash(payload.newPassword, config.salt_round as string)
+
+    const updatePassword = await prisma.user.update({
+        where: {
+            email: decoded.email
+        },
+        data: {
+            password: hashPassword,
+            needPasswordChange: true
+        }
+    })
+
+    if (!updatePassword) {
+        throw new AppError(httpStatus.BAD_REQUEST, "Fail to update Password")
+    }
+    return {
+        message: 'Password Changed Successfully!!!'
+    }
+
+}
+
 export const authService = {
     loginInDB,
-    refreshToken
+    refreshToken,
+    changePassword
 }

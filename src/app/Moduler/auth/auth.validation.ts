@@ -6,3 +6,9 @@ export const loginValidation = z.object({
         password: z.string()
     })
 })
+export const passwordValidation = z.object({
+    body: z.object({
+        oldPassword: z.string(),
+        newPassword: z.string(),
+    })
+})

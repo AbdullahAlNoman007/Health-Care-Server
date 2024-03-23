@@ -3,7 +3,8 @@ import AppError from "../Error/AppError";
 import catchAsync from "../utility/trycatch";
 import { jwtDecode } from "jwt-decode";
 import prisma from "../utility/prismaClient";
-import { TdecodedData } from "../Moduler/auth/auth.interface";
+import { TdecodedData } from "../interface";
+
 
 const auth = (...roles: string[]) => {
 
