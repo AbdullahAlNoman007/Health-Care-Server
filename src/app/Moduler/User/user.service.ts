@@ -3,13 +3,18 @@ import { Tadmin } from "./user.interface";
 import bcrypt from 'bcrypt'
 import prisma from "../../utility/prismaClient";
 import config from "../../config";
+import { fileUploader } from "../../utility/sendImage";
+import { TCloudinaryImage } from "../../interface";
 
-
-
-
-const createAdminIntoDB = async (payload: Tadmin, fileUpload: { path: string, name: string }) => {
+const createAdminIntoDB = async (payload: Tadmin, path: string) => {
 
     const hashPassword = await bcrypt.hash(payload.password, Number(config.hash_salt_round as string))
+
+    const ImageData = await fileUploader.uploadImage(path) as TCloudinaryImage
+
+    if (ImageData) {
+        payload.admin.profilePhoto = ImageData.secure_url
+    }
 
     const userData = {
         email: payload.admin.email,

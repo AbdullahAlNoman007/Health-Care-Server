@@ -1,12 +1,13 @@
 export interface Tadmin {
-    password: string
-    admin: adminDetails
+    password: string;
+    admin: adminDetails;
 }
 
 interface adminDetails {
-    name: string
-    email: string
-    contactNumber: string
+    name: string;
+    email: string;
+    contactNumber: string;
+    profilePhoto?: string;
 }
 
 export type TfileUploadInfo = {

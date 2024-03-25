@@ -6,12 +6,8 @@ import { TfileUploadInfo } from "./user.interface";
 
 const createAdmin = catchAsync(async (req, res) => {
     const file: TfileUploadInfo = req.file
-    const fileUpload = {
-        path: file?.path as string,
-        name: file?.originalname as string
-    }
 
-    const result = await userService.createAdminIntoDB(req.body, fileUpload)
+    const result = await userService.createAdminIntoDB(req.body, file?.path as string)
 
     sendRespone(res, {
         statusCode: httpStatus.CREATED,

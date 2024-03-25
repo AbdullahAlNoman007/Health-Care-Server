@@ -27,9 +27,9 @@ const loginInDB = async (payload: Tlogin) => {
         role: isUserExists.role
     }
 
-    const accessToken = token(jwtPayload, config.jwt_access_token as string, config.jwt_access_expires_in as string)
+    const accessToken = token(jwtPayload, config.jwt.jwt_access_token as string, config.jwt.jwt_access_expires_in as string)
 
-    const refreshToken = token(jwtPayload, config.jwt_refresh_token as string, config.jwt_refresh_expires_in as string)
+    const refreshToken = token(jwtPayload, config.jwt.jwt_refresh_token as string, config.jwt.jwt_refresh_expires_in as string)
 
     return {
         accessToken,
@@ -61,7 +61,7 @@ const refreshToken = async (payload: { refreshToken: string }) => {
         role: userData.role
     }
 
-    const accessToken = token(jwtPayload, config.jwt_access_token as string, config.jwt_access_expires_in as string)
+    const accessToken = token(jwtPayload, config.jwt.jwt_access_token as string, config.jwt.jwt_access_expires_in as string)
 
     return {
         accessToken,
@@ -119,9 +119,9 @@ const forgetPassword = async (payload: { email: string }) => {
         email: userData?.email,
         role: userData?.role
     }
-    const resetToken = token(jwtPayload, config.jwt_access_token as string, '5m')
+    const resetToken = token(jwtPayload, config.jwt.jwt_access_token as string, '5m')
 
-    const resetPassLink = config.reset_pass_link + `?userId=${userData?.id}&token=${resetToken}`
+    const resetPassLink = config.forgetPassword.reset_pass_link + `?userId=${userData?.id}&token=${resetToken}`
 
     await sendEmail(
         userData.email,

@@ -7,8 +7,8 @@ const sendEmail = async (email: string, html: string) => {
         port: 587,
         secure: false,
         auth: {
-            user: config.email,
-            pass: config.email_pass,
+            user: config.forgetPassword.email,
+            pass: config.forgetPassword.email_pass,
         },
         tls: {
             rejectUnauthorized: false
@@ -16,7 +16,7 @@ const sendEmail = async (email: string, html: string) => {
     });
 
     const info = await transporter.sendMail({
-        from: `"Health Care" <${config.email}>`,
+        from: `"Health Care" <${config.forgetPassword.email}>`,
         to: email,
         subject: "Reset Password Link",
         html: html
