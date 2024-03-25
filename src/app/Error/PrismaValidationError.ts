@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 import httpStatus from "http-status";
 
 const handlePrismaValidationError = (err: Prisma.PrismaClientValidationError) => {
+
     const statusCode = httpStatus.NOT_FOUND;
     const Message = err.name;
 
@@ -13,7 +14,7 @@ const handlePrismaValidationError = (err: Prisma.PrismaClientValidationError) =>
     const errorSource = [
         {
             path: '',
-            message: extractedMessage
+            message: errorMessage
         }
     ];
 

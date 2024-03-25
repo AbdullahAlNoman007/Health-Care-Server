@@ -18,5 +18,15 @@ router.post(
     },
     validateRequest(userValidation.adminCreateValidationSchema),
     userController.createAdmin)
+router.post(
+    '/create-doctor',
+    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+    fileUploader.upload.single("file"),
+    (req: Request, res: Response, next: NextFunction) => {
+        req.body = JSON.parse(req.body.data)
+        next()
+    },
+    validateRequest(userValidation.doctorCreateValidationSchema),
+    userController.createDoctor)
 
 export const userRouter = router
