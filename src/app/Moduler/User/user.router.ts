@@ -42,4 +42,6 @@ router.post(
     validateRequest(userValidation.patientCreateValidationSchema),
     userController.createPatient)
 
+router.get('/get-user', userController.getAllUser)
+
 export const userRouter = router

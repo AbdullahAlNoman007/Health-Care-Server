@@ -3,6 +3,9 @@ import sendRespone from "../../utility/sendResponse";
 import catchAsync from "../../utility/trycatch";
 import { userService } from "./user.service";
 import { TfileUploadInfo } from "./user.interface";
+import pick from "../../utility/pick";
+import { adminPaginationFields } from "../admin/admin.const";
+import { userFilterField } from "./user.const";
 
 const createAdmin = catchAsync(async (req, res) => {
 
@@ -53,8 +56,26 @@ const createPatient = catchAsync(async (req, res) => {
     })
 })
 
+const getAllUser = catchAsync(async (req, res) => {
+
+    const filter = pick(req.query, userFilterField)
+    const options = pick(req.query, adminPaginationFields)
+
+    const result = await userService.getAllUser(filter, options)
+
+    sendRespone(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'User data is retrieved',
+        meta: result.meta,
+        data: result.data
+    })
+})
+
+
 export const userController = {
     createAdmin,
     createDoctor,
-    createPatient
+    createPatient,
+    getAllUser
 }

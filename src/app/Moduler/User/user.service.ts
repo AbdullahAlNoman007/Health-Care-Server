@@ -1,10 +1,12 @@
-import { UserRole } from "@prisma/client";
-import { Tadmin, Tdoctor, Tpatient } from "./user.interface";
+import { Prisma, UserRole } from "@prisma/client";
+import { Tadmin, Tdoctor, Tpatient, TuserQuery } from "./user.interface";
 import bcrypt from 'bcrypt'
 import prisma from "../../utility/prismaClient";
 import config from "../../config";
 import { fileUploader } from "../../utility/sendImage";
 import { TCloudinaryImage } from "../../interface";
+import { userSearchField } from "./user.const";
+import calculatePagination from "../../utility/pagination";
 
 const createAdminIntoDB = async (payload: Tadmin, path: string) => {
     let ImageData;
@@ -98,8 +100,61 @@ const createPatientIntoDB = async (payload: Tpatient, path: string) => {
     return result;
 }
 
+const getAllUser = async (payload: TuserQuery, options: any) => {
+    const { limit, orderBy, orderSort, skip, page } = calculatePagination(options)
+    const searchField: Prisma.UserWhereInput[] = []
+    const { searchTerm, ...rest } = payload;
+    if (searchTerm) {
+        searchField.push(
+            {
+                OR: userSearchField.map(field => ({
+                    [field]: {
+                        contains: searchTerm,
+                        mode: 'insensitive'
+                    }
+                }))
+            })
+
+    }
+    if (Object.keys(rest).length > 0) {
+        searchField.push({
+            OR: Object.keys(rest).map(field => ({
+                [field]: {
+                    equals: (rest as any)[field],
+                    mode: 'insensitive'
+                }
+            }))
+        })
+    }
+
+    const andCondition: Prisma.UserWhereInput = {
+        AND: searchField
+    }
+
+    const result = await prisma.user.findMany({
+        where: andCondition,
+        skip,
+        take: limit,
+        orderBy: {
+            [orderBy]: orderSort
+        }
+    })
+
+    const total = await prisma.user.count()
+
+    return {
+        meta: {
+            page,
+            limit,
+            total
+        },
+        data: result
+    }
+}
+
 export const userService = {
     createAdminIntoDB,
     createDoctorIntoDB,
-    createPatientIntoDB
+    createPatientIntoDB,
+    getAllUser
 }

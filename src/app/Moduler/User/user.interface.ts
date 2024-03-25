@@ -52,3 +52,7 @@ export type TfileUploadInfo = {
     size: number;
 } | undefined;
 
+export interface TuserQuery {
+    email?: string;
+    searchTerm?: string;
+}
