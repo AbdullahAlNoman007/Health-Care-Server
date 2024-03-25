@@ -1,4 +1,4 @@
-import { Prisma, UserRole } from "@prisma/client";
+import { Prisma, UserRole, UserStatus } from "@prisma/client";
 import { Tadmin, Tdoctor, Tpatient, TuserQuery } from "./user.interface";
 import bcrypt from 'bcrypt'
 import prisma from "../../utility/prismaClient";
@@ -137,6 +137,18 @@ const getAllUser = async (payload: TuserQuery, options: any) => {
         take: limit,
         orderBy: {
             [orderBy]: orderSort
+        },
+        select: {
+            id: true,
+            email: true,
+            role: true,
+            needPasswordChange: true,
+            status: true,
+            createdAt: true,
+            updatedAt: true,
+            Admin: true,
+            Patient: true,
+            Doctor: true
         }
     })
 
@@ -152,9 +164,38 @@ const getAllUser = async (payload: TuserQuery, options: any) => {
     }
 }
 
+const changeStatus = async (id: string, status: UserStatus) => {
+
+    await prisma.user.findUniqueOrThrow({
+        where: {
+            id: id
+        }
+    })
+    const updateResult = await prisma.user.update({
+        where: {
+            id: id
+        },
+        data: status,
+        select: {
+            id: true,
+            email: true,
+            role: true,
+            needPasswordChange: true,
+            status: true,
+            createdAt: true,
+            updatedAt: true
+        }
+    })
+
+    return updateResult
+
+
+}
+
 export const userService = {
     createAdminIntoDB,
     createDoctorIntoDB,
     createPatientIntoDB,
-    getAllUser
+    getAllUser,
+    changeStatus
 }

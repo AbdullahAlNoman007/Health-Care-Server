@@ -24,6 +24,11 @@ const patientCreateValidationSchema = z.object({
         })
     })
 })
+const changeStatudValidationSchema = z.object({
+    body: z.object({
+        status: z.enum(['ACTIVE', 'BLOCKED'])
+    })
+})
 
 
 const doctorCreateValidationSchema = z.object({
@@ -51,5 +56,6 @@ const doctorCreateValidationSchema = z.object({
 export const userValidation = {
     adminCreateValidationSchema,
     doctorCreateValidationSchema,
-    patientCreateValidationSchema
+    patientCreateValidationSchema,
+    changeStatudValidationSchema
 }

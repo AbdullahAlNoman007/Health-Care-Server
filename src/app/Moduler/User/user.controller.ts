@@ -6,6 +6,7 @@ import { TfileUploadInfo } from "./user.interface";
 import pick from "../../utility/pick";
 import { adminPaginationFields } from "../admin/admin.const";
 import { userFilterField } from "./user.const";
+import { UserStatus } from "@prisma/client";
 
 const createAdmin = catchAsync(async (req, res) => {
 
@@ -72,10 +73,24 @@ const getAllUser = catchAsync(async (req, res) => {
     })
 })
 
+const changeStatus = catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const status: UserStatus = req.body
+    const result = await userService.changeStatus(id, status)
+
+    sendRespone(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'User status is changed',
+        data: result
+    })
+})
+
 
 export const userController = {
     createAdmin,
     createDoctor,
     createPatient,
-    getAllUser
+    getAllUser,
+    changeStatus
 }

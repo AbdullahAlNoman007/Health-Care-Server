@@ -42,6 +42,7 @@ router.post(
     validateRequest(userValidation.patientCreateValidationSchema),
     userController.createPatient)
 
-router.get('/get-user', userController.getAllUser)
+router.get('/get-user', auth(UserRole.SUPER_ADMIN, UserRole.ADMIN), userController.getAllUser)
+router.patch('/change-status/:id', auth(UserRole.SUPER_ADMIN, UserRole.ADMIN), validateRequest(userValidation.changeStatudValidationSchema), userController.changeStatus)
 
 export const userRouter = router
