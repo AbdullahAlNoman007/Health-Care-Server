@@ -9,7 +9,7 @@ import config from "../../config";
 
 const createAdminIntoDB = async (payload: Tadmin) => {
 
-    const hashPassword = await bcrypt.hash(payload.password, config.salt_round as string)
+    const hashPassword = await bcrypt.hash(payload.password, Number(config.hash_salt_round as string))
 
     const userData = {
         email: payload.admin.email,

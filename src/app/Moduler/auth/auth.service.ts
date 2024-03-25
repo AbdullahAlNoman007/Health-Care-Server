@@ -87,7 +87,7 @@ const changePassword = async (decoded: TdecodedData, payload: { oldPassword: str
         throw new AppError(httpStatus.BAD_REQUEST, "Old password doesn't matched")
     }
 
-    const hashPassword = await bcrypt.hash(payload.newPassword, config.salt_round as string)
+    const hashPassword = await bcrypt.hash(payload.newPassword, Number(config.hash_salt_round as string))
 
     const updatePassword = await prisma.user.update({
         where: {
@@ -159,7 +159,7 @@ const resetPassword = async (token: string, payload: { id: string, password: str
         throw new AppError(httpStatus.FORBIDDEN, "Provied Valid Data")
     }
 
-    const hashPassword = await bcrypt.hash(payload.password, config.salt_round as string)
+    const hashPassword = await bcrypt.hash(payload.password, Number(config.hash_salt_round as string))
 
     const resetPassword = await prisma.user.update({
         where: {
