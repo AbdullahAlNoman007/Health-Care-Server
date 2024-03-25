@@ -7,10 +7,12 @@ import { fileUploader } from "../../utility/sendImage";
 import { TCloudinaryImage } from "../../interface";
 
 const createAdminIntoDB = async (payload: Tadmin, path: string) => {
-
+    let ImageData;
     const hashPassword = await bcrypt.hash(payload.password, Number(config.hash_salt_round as string))
 
-    const ImageData = await fileUploader.uploadImage(path) as TCloudinaryImage
+    if (path) {
+        ImageData = await fileUploader.uploadImage(path) as TCloudinaryImage
+    }
 
     if (ImageData) {
         payload.admin.profilePhoto = ImageData.secure_url
@@ -36,15 +38,16 @@ const createAdminIntoDB = async (payload: Tadmin, path: string) => {
     return result;
 }
 const createDoctorIntoDB = async (payload: Tdoctor, path: string) => {
-
+    let ImageData;
     const hashPassword = await bcrypt.hash(payload.password, Number(config.hash_salt_round as string))
 
-    const ImageData = await fileUploader.uploadImage(path) as TCloudinaryImage
+    if (path) {
+        ImageData = await fileUploader.uploadImage(path) as TCloudinaryImage
+    }
 
     if (ImageData) {
         payload.doctor.profilePhoto = ImageData.secure_url
     }
-
     const userData = {
         email: payload.doctor.email,
         password: hashPassword,
@@ -65,9 +68,12 @@ const createDoctorIntoDB = async (payload: Tdoctor, path: string) => {
 }
 const createPatientIntoDB = async (payload: Tpatient, path: string) => {
 
+    let ImageData;
     const hashPassword = await bcrypt.hash(payload.password, Number(config.hash_salt_round as string))
 
-    const ImageData = await fileUploader.uploadImage(path) as TCloudinaryImage
+    if (path) {
+        ImageData = await fileUploader.uploadImage(path) as TCloudinaryImage
+    }
 
     if (ImageData) {
         payload.patient.profilePhoto = ImageData.secure_url

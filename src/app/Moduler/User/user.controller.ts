@@ -5,7 +5,11 @@ import { userService } from "./user.service";
 import { TfileUploadInfo } from "./user.interface";
 
 const createAdmin = catchAsync(async (req, res) => {
-    const file: TfileUploadInfo = req.file
+
+    let file: TfileUploadInfo
+    if (req.file) {
+        file = req.file
+    }
 
     const result = await userService.createAdminIntoDB(req.body, file?.path as string)
 
@@ -17,7 +21,11 @@ const createAdmin = catchAsync(async (req, res) => {
     })
 })
 const createDoctor = catchAsync(async (req, res) => {
-    const file: TfileUploadInfo = req.file
+
+    let file: TfileUploadInfo
+    if (req.file) {
+        file = req.file
+    }
 
     const result = await userService.createDoctorIntoDB(req.body, file?.path as string)
 
@@ -29,7 +37,11 @@ const createDoctor = catchAsync(async (req, res) => {
     })
 })
 const createPatient = catchAsync(async (req, res) => {
-    const file: TfileUploadInfo = req.file
+
+    let file: TfileUploadInfo
+    if (req.file) {
+        file = req.file
+    }
 
     const result = await userService.createPatientIntoDB(req.body, file?.path as string)
 
