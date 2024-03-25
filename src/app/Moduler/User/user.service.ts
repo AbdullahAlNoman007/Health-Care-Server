@@ -7,7 +7,7 @@ import config from "../../config";
 
 
 
-const createAdminIntoDB = async (payload: Tadmin) => {
+const createAdminIntoDB = async (payload: Tadmin, fileUpload: { path: string, name: string }) => {
 
     const hashPassword = await bcrypt.hash(payload.password, Number(config.hash_salt_round as string))
 

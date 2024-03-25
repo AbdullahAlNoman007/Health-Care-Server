@@ -8,3 +8,15 @@ interface adminDetails {
     email: string
     contactNumber: string
 }
+
+export type TfileUploadInfo = {
+    fieldname: string;
+    originalname: string;
+    encoding: string;
+    mimetype: string;
+    destination: string;
+    filename: string;
+    path: string;
+    size: number;
+} | undefined;
+
