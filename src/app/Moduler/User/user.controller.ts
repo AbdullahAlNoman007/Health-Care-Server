@@ -28,8 +28,21 @@ const createDoctor = catchAsync(async (req, res) => {
         data: result
     })
 })
+const createPatient = catchAsync(async (req, res) => {
+    const file: TfileUploadInfo = req.file
+
+    const result = await userService.createPatientIntoDB(req.body, file?.path as string)
+
+    sendRespone(res, {
+        statusCode: httpStatus.CREATED,
+        success: true,
+        message: 'Patient is Created',
+        data: result
+    })
+})
 
 export const userController = {
     createAdmin,
-    createDoctor
+    createDoctor,
+    createPatient
 }

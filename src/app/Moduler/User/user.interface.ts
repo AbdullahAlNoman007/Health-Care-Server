@@ -6,12 +6,23 @@ export interface Tdoctor {
     password: string;
     doctor: doctorDetails;
 }
+export interface Tpatient {
+    password: string;
+    patient: patientDetails;
+}
 
 interface adminDetails {
     name: string;
     email: string;
     contactNumber: string;
     profilePhoto?: string;
+}
+interface patientDetails {
+    name: string;
+    email: string;
+    contactNumber: string;
+    profilePhoto?: string;
+    address: string;
 }
 
 interface doctorDetails {
