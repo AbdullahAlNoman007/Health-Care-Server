@@ -98,6 +98,23 @@ const getMyProfile = catchAsync(async (req, res) => {
     })
 })
 
+const updateProfile = catchAsync(async (req, res) => {
+
+    let file: TfileUploadInfo
+    if (req.file) {
+        file = req.file
+    }
+
+    const result = await userService.updateProfile(req.body || {}, req.user, file?.path as string)
+
+    sendRespone(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Profile is update",
+        data: result
+    })
+})
+
 
 export const userController = {
     createAdmin,
@@ -105,5 +122,6 @@ export const userController = {
     createPatient,
     getAllUser,
     changeStatus,
-    getMyProfile
+    getMyProfile,
+    updateProfile
 }

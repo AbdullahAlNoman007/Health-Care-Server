@@ -11,13 +11,13 @@ export interface Tpatient {
     patient: patientDetails;
 }
 
-interface adminDetails {
+export interface adminDetails {
     name: string;
     email: string;
     contactNumber: string;
     profilePhoto?: string;
 }
-interface patientDetails {
+export interface patientDetails {
     name: string;
     email: string;
     contactNumber: string;
@@ -25,7 +25,7 @@ interface patientDetails {
     address: string;
 }
 
-interface doctorDetails {
+export interface doctorDetails {
     name: string;
     email: string;
     profilePhoto?: string | null;

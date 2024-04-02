@@ -1,5 +1,5 @@
 import { Prisma, UserRole, UserStatus } from "@prisma/client";
-import { Tadmin, Tdoctor, Tpatient, TuserQuery } from "./user.interface";
+import { Tadmin, Tdoctor, Tpatient, TuserQuery, adminDetails, doctorDetails, patientDetails } from "./user.interface";
 import bcrypt from 'bcrypt'
 import prisma from "../../utility/prismaClient";
 import config from "../../config";
@@ -247,11 +247,65 @@ const getMyProfile = async (decode: TdecodedData) => {
 
 }
 
+const updateProfile = async (payload: adminDetails | patientDetails | doctorDetails, decode: TdecodedData, path: string) => {
+    let ImageData;
+    let userProfile;
+    const role = decode.role;
+    if (path) {
+        ImageData = await fileUploader.uploadImage(path) as TCloudinaryImage
+    }
+    payload
+    if (ImageData) {
+        payload.profilePhoto = ImageData.secure_url
+    }
+    if (role === 'ADMIN') {
+        userProfile = await prisma.admin.update({
+            where: {
+                email: decode.email,
+                isDeleted: false
+            },
+            data: payload
+        })
+    }
+    else if (role === 'DOCTOR') {
+        userProfile = await prisma.doctor.update({
+            where: {
+                email: decode.email,
+                isDeleted: false
+            },
+            data: payload
+        })
+    }
+    else if (role === 'PATIENT') {
+        userProfile = await prisma.patient.update({
+            where: {
+                email: decode.email,
+                isDeleted: false
+            },
+            data: payload
+        })
+    }
+    else if (role === 'SUPER_ADMIN') {
+        userProfile = await prisma.admin.update({
+            where: {
+                email: decode.email,
+                isDeleted: false
+            },
+            data: payload
+        })
+    }
+
+    return { ...userProfile }
+
+
+}
+
 export const userService = {
     createAdminIntoDB,
     createDoctorIntoDB,
     createPatientIntoDB,
     getAllUser,
     changeStatus,
-    getMyProfile
+    getMyProfile,
+    updateProfile
 }
