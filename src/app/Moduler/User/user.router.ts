@@ -45,4 +45,6 @@ router.post(
 router.get('/get-user', auth(UserRole.SUPER_ADMIN, UserRole.ADMIN), userController.getAllUser)
 router.patch('/change-status/:id', auth(UserRole.SUPER_ADMIN, UserRole.ADMIN), validateRequest(userValidation.changeStatudValidationSchema), userController.changeStatus)
 
+router.get('/get-profile', auth(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT, UserRole.SUPER_ADMIN), userController.getMyProfile)
+
 export const userRouter = router

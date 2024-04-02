@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt'
 import prisma from "../../utility/prismaClient";
 import config from "../../config";
 import { fileUploader } from "../../utility/sendImage";
-import { TCloudinaryImage } from "../../interface";
+import { TCloudinaryImage, TdecodedData } from "../../interface";
 import { userSearchField } from "./user.const";
 import calculatePagination from "../../utility/pagination";
 
@@ -192,10 +192,66 @@ const changeStatus = async (id: string, status: UserStatus) => {
 
 }
 
+const getMyProfile = async (decode: TdecodedData) => {
+    const role = decode.role;
+    let userProfile;
+    const user = await prisma.user.findUniqueOrThrow({
+        where: {
+            email: decode.email,
+            role: role,
+            status: 'ACTIVE'
+        },
+        select: {
+            id: true,
+            email: true,
+            needPasswordChange: true,
+            role: true,
+            status: true
+        }
+    })
+
+    if (role === 'ADMIN') {
+        userProfile = await prisma.admin.findUniqueOrThrow({
+            where: {
+                email: decode.email,
+                isDeleted: false
+            }
+        })
+    }
+    else if (role === 'DOCTOR') {
+        userProfile = await prisma.doctor.findUniqueOrThrow({
+            where: {
+                email: decode.email,
+                isDeleted: false
+            }
+        })
+    }
+    else if (role === 'PATIENT') {
+        userProfile = await prisma.patient.findUniqueOrThrow({
+            where: {
+                email: decode.email,
+                isDeleted: false
+            }
+        })
+    }
+    else if (role === 'SUPER_ADMIN') {
+        userProfile = await prisma.admin.findUniqueOrThrow({
+            where: {
+                email: decode.email,
+                isDeleted: false
+            }
+        })
+    }
+
+    return { ...user, ...userProfile }
+
+}
+
 export const userService = {
     createAdminIntoDB,
     createDoctorIntoDB,
     createPatientIntoDB,
     getAllUser,
-    changeStatus
+    changeStatus,
+    getMyProfile
 }

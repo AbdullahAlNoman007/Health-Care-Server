@@ -1,6 +1,8 @@
+import { UserRole } from "@prisma/client";
+
 export interface TdecodedData {
     email: string;
-    role: string;
+    role: UserRole;
     iat: number;
     exp: number;
 }
