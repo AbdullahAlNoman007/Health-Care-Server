@@ -254,7 +254,6 @@ const updateProfile = async (payload: adminDetails | patientDetails | doctorDeta
     if (path) {
         ImageData = await fileUploader.uploadImage(path) as TCloudinaryImage
     }
-    payload
     if (ImageData) {
         payload.profilePhoto = ImageData.secure_url
     }
