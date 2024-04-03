@@ -57,20 +57,55 @@ const getDoctor = async (params: TdoctorData, options: any) => {
     }
 }
 
-const getDoctorById = async () => {
+const getDoctorById = async (id: string) => {
+    const result = await prisma.doctor.findUniqueOrThrow({
+        where: {
+            id,
+            isDeleted: false
+        }
+    })
 
+    return result
 }
 
 const updateDoctor = async () => {
 
 }
 
-const deleteDoctor = async () => {
+const deleteDoctor = async (id: string) => {
 
+    await prisma.doctor.findUniqueOrThrow({
+        where: {
+            id,
+            isDeleted: false
+        }
+    })
+
+    const result = await prisma.doctor.delete({
+        where: {
+            id
+        }
+    })
+    return result
 }
 
-const softdeleteDoctor = async () => {
+const softdeleteDoctor = async (id: string) => {
 
+    await prisma.doctor.findUniqueOrThrow({
+        where: {
+            id,
+            isDeleted: false
+        }
+    })
+
+    const result = await prisma.doctor.update({
+        where: {
+            id
+        },
+        data: {
+            isDeleted: true
+        }
+    })
 }
 
 export const doctorService = {

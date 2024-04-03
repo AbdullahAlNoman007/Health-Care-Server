@@ -21,12 +21,13 @@ const getDoctor = catchAsync(async (req, res) => {
 })
 
 const getDoctorById = catchAsync(async (req, res) => {
-    const result = await doctorService.getDoctorById()
+    const { id } = req.params
+    const result = await doctorService.getDoctorById(id)
 
     sendRespone(res, {
         success: true,
         statusCode: httpStatus.OK,
-        message: "",
+        message: "Doctor data is retrived successfully",
         data: result
     })
 })
@@ -43,23 +44,25 @@ const updateDoctor = catchAsync(async (req, res) => {
 })
 
 const deleteDoctor = catchAsync(async (req, res) => {
-    const result = await doctorService.deleteDoctor()
+    const { id } = req.params
+    const result = await doctorService.deleteDoctor(id)
 
     sendRespone(res, {
         success: true,
         statusCode: httpStatus.OK,
-        message: "",
+        message: "Doctor is Deleted",
         data: result
     })
 })
 
 const softdeleteDoctor = catchAsync(async (req, res) => {
-    const result = await doctorService.softdeleteDoctor()
+    const { id } = req.params
+    const result = await doctorService.softdeleteDoctor(id)
 
     sendRespone(res, {
         success: true,
         statusCode: httpStatus.OK,
-        message: "",
+        message: "Doctor is deleted softly",
         data: result
     })
 })
