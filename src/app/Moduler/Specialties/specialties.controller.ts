@@ -21,7 +21,32 @@ const createSpecialties = catchAsync(async (req, res) => {
         data: result
     })
 })
+const getSpecialties = catchAsync(async (req, res) => {
+
+    const result = await specialtiesService.getSpecialties()
+    sendRespone(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Specialty is fetched",
+        data: result
+    })
+})
+const deleteSpecialties = catchAsync(async (req, res) => {
+
+    const { id } = req.params
+
+    const result = await specialtiesService.deleteSpecialties(id)
+
+    sendRespone(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Specialty is deleted",
+        data: result
+    })
+})
 
 export const specialtiesController = {
-    createSpecialties
+    createSpecialties,
+    getSpecialties,
+    deleteSpecialties
 }

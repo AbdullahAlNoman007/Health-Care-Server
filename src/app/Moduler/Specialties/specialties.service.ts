@@ -18,6 +18,30 @@ const createSpecialties = async (payload: { title: string, icon: string }, path:
     return result
 }
 
+const getSpecialties = async () => {
+    const result = await prisma.specialties.findMany()
+    return result
+
+}
+const deleteSpecialties = async (id: string) => {
+
+    await prisma.specialties.findUniqueOrThrow({
+        where: {
+            id
+        }
+    })
+
+    const result = await prisma.specialties.delete({
+        where: {
+            id
+        }
+    })
+
+    return result
+}
+
 export const specialtiesService = {
-    createSpecialties
+    createSpecialties,
+    getSpecialties,
+    deleteSpecialties
 }
