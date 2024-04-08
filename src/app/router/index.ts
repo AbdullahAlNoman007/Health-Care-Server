@@ -5,6 +5,7 @@ import { authRouter } from '../Moduler/auth/auth.router';
 import { specialtiesRoute } from '../Moduler/Specialties/specialties.router';
 import { doctorRouter } from '../Moduler/doctor/doctor.router';
 import { patientRouter } from '../Moduler/Patient/Patient.router';
+import { ScheduleRouter } from '../Moduler/Schedule/Schedule.router';
 
 const router = express.Router()
 
@@ -33,6 +34,10 @@ const moduleRouters = [
         path: '/patient',
         route: patientRouter
     },
+    {
+        path: '/schedule',
+        route: ScheduleRouter
+    }
 ]
 
 moduleRouters?.map(route => router.use(route.path, route.route))
