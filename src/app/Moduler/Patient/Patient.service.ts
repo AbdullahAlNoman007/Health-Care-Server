@@ -63,6 +63,7 @@ const getPatient = async (params: IPatientFilterRequest, options: any) => {
 
 }
 const getPatientById = async (id: string) => {
+
     const result = await prisma.patient.findUniqueOrThrow({
         where: {
             id,
@@ -73,12 +74,113 @@ const getPatientById = async (id: string) => {
 }
 const updatePatient = async (id: string, payload: Partial<IPatientUpdate>) => {
 
+    const { patientHealthData, medicalReport, ...rest } = payload
+    await prisma.patient.findUniqueOrThrow({
+        where: {
+            id
+        }
+    })
+
+    await prisma.$transaction(async (tx) => {
+
+        await tx.patient.update({
+            where: {
+                id,
+                isDeleted: false
+            },
+            data: rest
+        })
+
+        if (medicalReport) {
+            await tx.medicalReport.create({
+                data: { patientId: id, ...medicalReport }
+            })
+        }
+        if (patientHealthData) {
+            await tx.patientHealthData.upsert({
+                where: {
+                    patientId: id
+                },
+                update: patientHealthData,
+                create: { ...patientHealthData, patientId: id }
+            })
+        }
+    })
+
+    const patientInfo = await prisma.patient.findUniqueOrThrow({
+        where: {
+            id
+        },
+        include: {
+            PatientHealthData: true,
+            MedicalReport: true
+        }
+    })
+    return patientInfo
+
 }
 const deletePatient = async (id: string) => {
+    const result = await prisma.$transaction(async (tx) => {
 
+        await tx.medicalReport.deleteMany({
+            where: {
+                patientId: id
+            }
+        })
+
+        await tx.patientHealthData.delete({
+            where: {
+                patientId: id
+            }
+        })
+
+        const deletePatient = await tx.patient.delete({
+            where: {
+                id
+            }
+        })
+
+        await tx.user.delete({
+            where: {
+                email: deletePatient.email
+            }
+        })
+
+        return deletePatient
+    })
+
+    return result
 }
 const softDeletePatient = async (id: string) => {
+    await prisma.patient.findUniqueOrThrow({
+        where: {
+            id
+        }
+    })
 
+    const result = await prisma.$transaction(async (tx) => {
+        const deletePatient = await tx.patient.update({
+            where: {
+                id
+            },
+            data: {
+                isDeleted: true
+            }
+        })
+
+        await prisma.user.update({
+            where: {
+                email: deletePatient.email
+            },
+            data: {
+                status: 'BLOCKED'
+            }
+        })
+
+        return deletePatient
+    })
+
+    return result
 }
 
 export const patientService = {

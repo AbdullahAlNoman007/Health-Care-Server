@@ -22,7 +22,7 @@ const getPatient = catchAsync(async (req, res) => {
 })
 const getPatientById = catchAsync(async (req, res) => {
 
-    const { id } = req.query
+    const { id } = req.params
 
     const result = await patientService.getPatientById(id as string)
 
@@ -34,7 +34,7 @@ const getPatientById = catchAsync(async (req, res) => {
     })
 })
 const updatePatient = catchAsync(async (req, res) => {
-    const { id } = req.query
+    const { id } = req.params
 
     const result = await patientService.updatePatient(id as string, req.body)
 
@@ -46,7 +46,7 @@ const updatePatient = catchAsync(async (req, res) => {
     })
 })
 const deletePatient = catchAsync(async (req, res) => {
-    const { id } = req.query
+    const { id } = req.params
 
     const result = await patientService.deletePatient(id as string)
 
@@ -58,7 +58,7 @@ const deletePatient = catchAsync(async (req, res) => {
     })
 })
 const softDeletePatient = catchAsync(async (req, res) => {
-    const { id } = req.query
+    const { id } = req.params
 
     const result = await patientService.softDeletePatient(id as string)
 
