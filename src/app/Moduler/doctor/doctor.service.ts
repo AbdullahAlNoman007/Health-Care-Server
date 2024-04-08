@@ -68,8 +68,61 @@ const getDoctorById = async (id: string) => {
     return result
 }
 
-const updateDoctor = async () => {
+const updateDoctor = async (id: string, payload: any) => {
+    const { specialties, ...doctorData } = payload;
+    await prisma.doctor.findUniqueOrThrow({
+        where: {
+            id
+        }
+    })
 
+    await prisma.$transaction(async (tx) => {
+
+        const doctorUpdate = await tx.doctor.update({
+            where: {
+                id
+            },
+            data: doctorData,
+            include: {
+                DoctorSpecialties: true
+            }
+        })
+
+        if (specialties && specialties.length > 0) {
+
+            const deleteSpecialties = specialties.filter((specialty: any) => specialty.isDeleted)
+            const createSpecialties = specialties.filter((specialty: any) => !specialty.isDeleted)
+
+            for (const specialty of deleteSpecialties) {
+                await tx.doctorSpecialties.deleteMany({
+                    where: {
+                        doctorId: doctorUpdate.id,
+                        specialitiesId: specialty.id
+                    }
+                })
+            }
+
+            for (const specialty of createSpecialties) {
+                await tx.doctorSpecialties.create({
+                    data: {
+                        doctorId: doctorUpdate.id,
+                        specialitiesId: specialty.id
+                    }
+                })
+            }
+
+
+        }
+
+    })
+
+    const result = await prisma.doctor.findUniqueOrThrow({
+        where: {
+            id
+        }
+    })
+
+    return result
 }
 
 const deleteDoctor = async (id: string) => {

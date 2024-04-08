@@ -33,12 +33,13 @@ const getDoctorById = catchAsync(async (req, res) => {
 })
 
 const updateDoctor = catchAsync(async (req, res) => {
-    const result = await doctorService.updateDoctor()
+    const { id } = req.params
+    const result = await doctorService.updateDoctor(id, req.body)
 
     sendRespone(res, {
         success: true,
         statusCode: httpStatus.OK,
-        message: "",
+        message: "Doctor is updated",
         data: result
     })
 })
