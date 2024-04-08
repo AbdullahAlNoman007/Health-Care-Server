@@ -13,7 +13,7 @@ export const doctorFilterableFields: string[] = [
     'contactNumber',
     'gender',
     'apointmentFee',
-    'specialties'
+    'specialtie'
 ];
 
 export const doctorPaginationFields: string[] = [

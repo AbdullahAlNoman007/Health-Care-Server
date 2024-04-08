@@ -6,7 +6,8 @@ import calculatePagination from "../../utility/pagination";
 
 const getDoctor = async (params: TdoctorData, options: any) => {
     const { limit, orderBy, orderSort, skip, page } = calculatePagination(options)
-    const { searchTerm, ...rest } = params;
+    const { searchTerm, specialtie, ...rest } = params;
+
 
     const andCondition: Prisma.DoctorWhereInput[] = [];
     andCondition.push({
@@ -20,6 +21,21 @@ const getDoctor = async (params: TdoctorData, options: any) => {
                     mode: 'insensitive'
                 }
             }))
+        })
+    }
+
+    if (specialtie && specialtie.length > 0) {
+        andCondition.push({
+            DoctorSpecialties: {
+                some: {
+                    specialities: {
+                        title: {
+                            contains: specialtie,
+                            mode: 'insensitive'
+                        }
+                    }
+                }
+            }
         })
     }
 
@@ -42,6 +58,13 @@ const getDoctor = async (params: TdoctorData, options: any) => {
         take: limit,
         orderBy: {
             [orderBy]: orderSort
+        },
+        include: {
+            DoctorSpecialties: {
+                include: {
+                    specialities: true
+                }
+            }
         }
     })
 
@@ -70,6 +93,7 @@ const getDoctorById = async (id: string) => {
 
 const updateDoctor = async (id: string, payload: any) => {
     const { specialties, ...doctorData } = payload;
+
     await prisma.doctor.findUniqueOrThrow({
         where: {
             id
@@ -78,14 +102,11 @@ const updateDoctor = async (id: string, payload: any) => {
 
     await prisma.$transaction(async (tx) => {
 
-        const doctorUpdate = await tx.doctor.update({
+        await tx.doctor.update({
             where: {
                 id
             },
-            data: doctorData,
-            include: {
-                DoctorSpecialties: true
-            }
+            data: doctorData
         })
 
         if (specialties && specialties.length > 0) {
@@ -96,19 +117,21 @@ const updateDoctor = async (id: string, payload: any) => {
             for (const specialty of deleteSpecialties) {
                 await tx.doctorSpecialties.deleteMany({
                     where: {
-                        doctorId: doctorUpdate.id,
+                        doctorId: id,
                         specialitiesId: specialty.id
                     }
                 })
+
             }
 
             for (const specialty of createSpecialties) {
                 await tx.doctorSpecialties.create({
                     data: {
-                        doctorId: doctorUpdate.id,
+                        doctorId: id,
                         specialitiesId: specialty.id
                     }
                 })
+
             }
 
 
@@ -119,6 +142,9 @@ const updateDoctor = async (id: string, payload: any) => {
     const result = await prisma.doctor.findUniqueOrThrow({
         where: {
             id
+        },
+        include: {
+            DoctorSpecialties: true
         }
     })
 
