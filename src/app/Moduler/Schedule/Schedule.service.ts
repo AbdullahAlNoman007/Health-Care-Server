@@ -56,6 +56,12 @@ const insertIntoDB = async (payload: Tschedule): Promise<Schedule[]> => {
     return scheduleArray;
 }
 
+const getSchedules = async () => {
+    const result = await prisma.schedule.findMany()
+    return result;
+}
+
 export const ScheduleService = {
-    insertIntoDB
+    insertIntoDB,
+    getSchedules
 }
