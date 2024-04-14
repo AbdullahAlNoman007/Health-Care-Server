@@ -68,7 +68,7 @@ const getDoctor = async (params: TdoctorData, options: any) => {
         }
     })
 
-    const total = await prisma.doctor.count()
+    const total = await prisma.doctor.count({ where: whereCondition })
 
     return {
         meta: {

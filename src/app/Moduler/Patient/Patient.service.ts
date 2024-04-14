@@ -50,7 +50,7 @@ const getPatient = async (params: IPatientFilterRequest, options: any) => {
         }
     })
 
-    const total = await prisma.patient.count()
+    const total = await prisma.patient.count({ where: whereCondition })
 
     return {
         meta: {
