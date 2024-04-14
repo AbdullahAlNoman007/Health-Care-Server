@@ -24,7 +24,7 @@ const createDoctorSchedule = async (user: TdecodedData, payload: { scheduleIds: 
     return result;
 }
 
-const getDoctorSchedule = async (params: any, option: any, user: TdecodedData) => {
+const getDoctorSchedule = async (params: TdoctorScheduleFilter, option: any, user: TdecodedData) => {
     const { limit, orderBy, orderSort, skip, page } = calculatePagination(option)
     const { startDate, endDate } = params;
 
@@ -74,7 +74,14 @@ const getDoctorSchedule = async (params: any, option: any, user: TdecodedData) =
 
 
 
-    const total = await prisma.schedule.count({ where: whereCondition })
+    const total = await prisma.schedule.count({
+        where: {
+            ...whereCondition,
+            id: {
+                notIn: doctorScheduleIds
+            }
+        }
+    })
 
     return {
         meta: {
