@@ -58,7 +58,7 @@ const getPatient = async (params: IPatientFilterRequest, options: any) => {
             page,
             limit
         },
-        data: { ...result }
+        data: result
     }
 
 }
