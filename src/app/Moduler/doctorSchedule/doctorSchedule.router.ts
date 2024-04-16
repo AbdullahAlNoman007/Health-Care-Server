@@ -7,5 +7,6 @@ const router = express.Router()
 
 router.post('/create', auth(UserRole.DOCTOR), doctorScheduleController.createDoctorSchedule)
 router.get('/get', auth(UserRole.DOCTOR), doctorScheduleController.getDoctorSchedule)
+router.get('/get-my', auth(UserRole.DOCTOR), doctorScheduleController.getMySchedule)
 
 export const doctorScheduleRouter = router;

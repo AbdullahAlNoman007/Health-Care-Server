@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 import { TdecodedData } from "../../interface"
 import calculatePagination from "../../utility/pagination";
 import prisma from "../../utility/prismaClient";
-import { TdoctorScheduleFilter } from "./doctorSchedule.interface";
+import { TMyScheduleFilter, TdoctorScheduleFilter } from "./doctorSchedule.interface";
 
 const createDoctorSchedule = async (user: TdecodedData, payload: { scheduleIds: string[] }) => {
     const { scheduleIds } = payload;
@@ -41,7 +41,7 @@ const getDoctorSchedule = async (params: TdoctorScheduleFilter, option: any, use
                 },
                 {
                     endDateTime: {
-                        gte: endDate
+                        lte: endDate
                     }
                 },
             ]
@@ -94,7 +94,83 @@ const getDoctorSchedule = async (params: TdoctorScheduleFilter, option: any, use
 
 }
 
+const getMySchedule = async (params: TMyScheduleFilter, option: any, user: TdecodedData) => {
+    const { limit, skip, page } = calculatePagination(option)
+    const { startDate, endDate, ...rest } = params;
+
+
+    const andCondition: Prisma.DoctorSchedulesWhereInput[] = [];
+
+
+    if (startDate && endDate) {
+        andCondition.push({
+            AND: [
+                {
+                    schedule: {
+                        startDateTime: {
+                            gte: startDate
+                        }
+                    }
+                },
+                {
+                    schedule: {
+                        endDateTime: {
+                            lte: endDate
+                        }
+                    }
+                },
+                {
+                    doctor: {
+                        email: user.email
+                    }
+                }
+            ]
+        })
+    }
+    if (Object.keys(rest).length > 0) {
+        if (typeof rest.isBooked === 'string' && rest.isBooked === 'true') {
+            rest.isBooked = true
+        }
+        else if (typeof rest.isBooked === 'string' && rest.isBooked === 'false') {
+            rest.isBooked = true
+        }
+        andCondition.push({
+            OR: Object.keys(rest).map(field => ({
+                [field]: {
+                    equals: (rest as any)[field],
+                    mode: 'insensitive'
+                }
+            }))
+        })
+    }
+
+    const whereCondition: Prisma.DoctorSchedulesWhereInput = andCondition.length > 0 ? { AND: andCondition } : {}
+
+    const result = await prisma.doctorSchedules.findMany({
+        where: whereCondition,
+        skip,
+        take: limit
+    })
+
+
+
+    const total = await prisma.doctorSchedules.count({
+        where: whereCondition
+    })
+
+    return {
+        meta: {
+            total,
+            page,
+            limit
+        },
+        data: result
+    }
+
+}
+
 export const doctorScheduleService = {
     createDoctorSchedule,
-    getDoctorSchedule
+    getDoctorSchedule,
+    getMySchedule
 }

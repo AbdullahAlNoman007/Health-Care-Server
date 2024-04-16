@@ -27,8 +27,22 @@ const getDoctorSchedule = catchAsync(async (req, res) => {
         data: result.data
     })
 })
+const getMySchedule = catchAsync(async (req, res) => {
+    const query = pick(req.query, ['startDate', 'endDate', 'isBooked'])
+    const option = pick(req.query, PaginationFields)
+
+    const result = await doctorScheduleService.getMySchedule(query, option, req.user)
+    sendRespone(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "My Schedules is fetched",
+        meta: result.meta,
+        data: result.data
+    })
+})
 
 export const doctorScheduleController = {
     createDoctorSchedule,
-    getDoctorSchedule
+    getDoctorSchedule,
+    getMySchedule
 }
