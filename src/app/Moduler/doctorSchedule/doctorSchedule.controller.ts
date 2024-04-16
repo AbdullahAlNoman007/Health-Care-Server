@@ -40,9 +40,20 @@ const getMySchedule = catchAsync(async (req, res) => {
         data: result.data
     })
 })
+const deleteSchedule = catchAsync(async (req, res) => {
+    const { id } = req.params
+    const result = await doctorScheduleService.deleteSchedule(id, req.user)
+    sendRespone(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Schedule is deleted",
+        data: result
+    })
+})
 
 export const doctorScheduleController = {
     createDoctorSchedule,
     getDoctorSchedule,
-    getMySchedule
+    getMySchedule,
+    deleteSchedule
 }

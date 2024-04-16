@@ -3,6 +3,8 @@ import { TdecodedData } from "../../interface"
 import calculatePagination from "../../utility/pagination";
 import prisma from "../../utility/prismaClient";
 import { TMyScheduleFilter, TdoctorScheduleFilter } from "./doctorSchedule.interface";
+import AppError from "../../Error/AppError";
+import httpStatus from "http-status";
 
 const createDoctorSchedule = async (user: TdecodedData, payload: { scheduleIds: string[] }) => {
     const { scheduleIds } = payload;
@@ -169,8 +171,43 @@ const getMySchedule = async (params: TMyScheduleFilter, option: any, user: Tdeco
 
 }
 
+const deleteSchedule = async (scheduleId: string, user: TdecodedData) => {
+    const doctor = await prisma.doctor.findUniqueOrThrow({
+        where: {
+            email: user.email
+        }
+    })
+
+    const isBookedSchedule = await prisma.doctorSchedules.findUnique({
+        where: {
+            doctorId_scheduleId: {
+                doctorId: doctor.id,
+                scheduleId: scheduleId
+            },
+            isBooked: true
+        }
+    })
+
+    if (isBookedSchedule) {
+        throw new AppError(httpStatus.BAD_REQUEST, "You can't delete paid Appoinment")
+    }
+
+    const deleteSchedule = await prisma.doctorSchedules.delete({
+        where: {
+            doctorId_scheduleId: {
+                doctorId: doctor.id,
+                scheduleId: scheduleId
+            }
+        }
+    })
+
+    return deleteSchedule
+
+}
+
 export const doctorScheduleService = {
     createDoctorSchedule,
     getDoctorSchedule,
-    getMySchedule
+    getMySchedule,
+    deleteSchedule
 }
