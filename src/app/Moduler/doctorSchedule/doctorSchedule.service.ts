@@ -103,6 +103,11 @@ const getMySchedule = async (params: TMyScheduleFilter, option: any, user: Tdeco
 
     const andCondition: Prisma.DoctorSchedulesWhereInput[] = [];
 
+    andCondition.push({
+        doctor: {
+            email: user.email
+        }
+    })
 
     if (startDate && endDate) {
         andCondition.push({
@@ -119,11 +124,6 @@ const getMySchedule = async (params: TMyScheduleFilter, option: any, user: Tdeco
                         endDateTime: {
                             lte: endDate
                         }
-                    }
-                },
-                {
-                    doctor: {
-                        email: user.email
                     }
                 }
             ]

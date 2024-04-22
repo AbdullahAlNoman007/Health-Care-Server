@@ -60,6 +60,7 @@ model Doctor {
   DoctorSpecialties   DoctorSpecialties[]
   DoctorSchedules     DoctorSchedules[]
   Appointment         Appointment[]
+  Prescription        Prescription[]
 
   @@map("doctors")
 }
@@ -78,6 +79,7 @@ model Patient {
   PatientHealthData PatientHealthData?
   MedicalReport     MedicalReport[]
   Appointment       Appointment[]
+  Prescription      Prescription[]
 
   @@map("patients")
 }
@@ -146,36 +148,70 @@ model Schedule {
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
   DoctorSchedules DoctorSchedules[]
-  Appointment     Appointment?
+  Appointment     Appointment[]
 
   @@map("schedules")
 }
 
 model DoctorSchedules {
   doctorId      String
-  doctor        Doctor   @relation(fields: [doctorId], references: [id])
+  doctor        Doctor       @relation(fields: [doctorId], references: [id])
   scheduleId    String
-  schedule      Schedule @relation(fields: [scheduleId], references: [id])
-  isBooked      Boolean  @default(false)
-  appointmentId String?
+  schedule      Schedule     @relation(fields: [scheduleId], references: [id])
+  isBooked      Boolean      @default(false)
+  appointmentId String?      @unique
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id])
 
   @@id([doctorId, scheduleId])
   @@map("doctor_schedules")
 }
 
 model Appointment {
-  id             String            @id @default(uuid())
-  patientId      String
-  patient        Patient           @relation(fields: [patientId], references: [id])
-  doctorId       String
-  doctor         Doctor            @relation(fields: [doctorId], references: [id])
-  scheduleId     String            @unique
-  schedule       Schedule          @relation(fields: [scheduleId], references: [id])
-  videoCallingId String?           @unique
-  status         AppointmentStatus @default(SCHEDULED)
-  paymentStatus  PaymentStatus     @default(UNPAID)
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
+  id              String            @id @default(uuid())
+  patientId       String
+  patient         Patient           @relation(fields: [patientId], references: [id])
+  doctorId        String
+  doctor          Doctor            @relation(fields: [doctorId], references: [id])
+  scheduleId      String
+  schedule        Schedule          @relation(fields: [scheduleId], references: [id])
+  videoCallingId  String            @unique
+  status          AppointmentStatus @default(SCHEDULED)
+  paymentStatus   PaymentStatus     @default(UNPAID)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  DoctorSchedules DoctorSchedules?
+  Payment         Payment?
+  Prescription    Prescription?
+
+  @@unique([doctorId, scheduleId])
+}
+
+model Payment {
+  id                 String        @id @default(uuid())
+  appointtmentId     String        @unique
+  appointment        Appointment   @relation(fields: [appointtmentId], references: [id])
+  amount             Int
+  transactionId      String        @default(uuid())
+  status             PaymentStatus @default(UNPAID)
+  paymentGatewayData Json?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+}
+
+model Prescription {
+  id            String      @id @default(uuid())
+  appointmentId String      @unique
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+
+  doctorId String
+  doctor   Doctor @relation(fields: [doctorId], references: [id])
+
+  patientId    String
+  patient      Patient  @relation(fields: [patientId], references: [id])
+  instructions String
+  followUpDate DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 enum AppointmentStatus {
