@@ -1,4 +1,4 @@
-import { AppointmentStatus, Prisma } from "@prisma/client";
+import { AppointmentStatus, PaymentStatus, Prisma } from "@prisma/client";
 import { TdecodedData } from "../../interface";
 import calculatePagination from "../../utility/pagination";
 import prisma from "../../utility/prismaClient";
@@ -234,9 +234,56 @@ const changeAppointmentStatus = async (appointmentId: string, statusData: { stat
     return result
 }
 
+const cancelUnPaidAppointments = async () => {
+    const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000)
+    const unpaidAppointments = await prisma.appointment.findMany({
+        where: {
+            paymentStatus: PaymentStatus.UNPAID,
+            createdAt: {
+                lte: thirtyMinutesAgo
+            }
+        }
+    })
+
+    const appointmentIdsCancel = unpaidAppointments.map(appointment => appointment.id)
+
+    await prisma.$transaction(async (tx) => {
+
+        await tx.payment.deleteMany({
+            where: {
+                appointtmentId: {
+                    in: appointmentIdsCancel
+                }
+            }
+        })
+
+        await tx.appointment.deleteMany({
+            where: {
+                id: {
+                    in: appointmentIdsCancel
+                }
+            }
+        })
+
+        for (const unpaidAppointment of unpaidAppointments) {
+            await tx.doctorSchedules.updateMany({
+                where: {
+                    doctorId: unpaidAppointment.doctorId,
+                    scheduleId: unpaidAppointment.scheduleId
+                },
+                data: {
+                    isBooked: false
+                }
+            })
+        }
+
+    })
+}
+
 export const appointmentService = {
     createAppointment,
     getMyAppointment,
     getAppointment,
-    changeAppointmentStatus
+    changeAppointmentStatus,
+    cancelUnPaidAppointments
 }
