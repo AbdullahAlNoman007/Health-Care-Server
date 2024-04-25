@@ -1,5 +1,8 @@
+import httpStatus from "http-status";
+import AppError from "../../Error/AppError";
 import prisma from "../../utility/prismaClient";
 import { SSLService } from "../SSL/ssl.service";
+import { PaymentStatus } from "@prisma/client";
 
 const initPayment = async (id: string) => {
 
@@ -35,8 +38,39 @@ const initPayment = async (id: string) => {
 }
 
 const validatePayment = async (payload: any) => {
-    console.log('hii');
+    if (!payload || !payload.status || !(payload.status === 'VALID')) {
+        throw new AppError(httpStatus.BAD_REQUEST, "Invalid Payment")
+    }
 
+    const response = await SSLService.validatePayment(payload)
+
+    if (response?.status !== 'VALID') {
+        throw new AppError(httpStatus.BAD_REQUEST, "Payment Failed!")
+    }
+
+    await prisma.$transaction(async (tx) => {
+        const payment = await tx.payment.update({
+            where: {
+                transactionId: response.tran_id
+            },
+            data: {
+                status: PaymentStatus.PAID,
+                paymentGatewayData: response
+            }
+        })
+        await tx.appointment.update({
+            where: {
+                id: payment.appointtmentId
+            },
+            data: {
+                paymentStatus: PaymentStatus.PAID
+            }
+        })
+    })
+
+    return {
+        message: "Payment Success!"
+    }
 }
 
 export const paymentService = {
