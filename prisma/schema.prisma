@@ -209,7 +209,7 @@ model Prescription {
   patientId    String
   patient      Patient  @relation(fields: [patientId], references: [id])
   instructions String
-  followUpDate DateTime
+  followUpDate String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }

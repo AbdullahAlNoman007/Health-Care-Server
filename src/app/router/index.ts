@@ -9,6 +9,7 @@ import { ScheduleRouter } from '../Moduler/Schedule/Schedule.router';
 import { doctorScheduleRouter } from '../Moduler/doctorSchedule/doctorSchedule.router';
 import { appointmentRouter } from '../Moduler/Appointment/Appointment.router';
 import { paymentRouter } from '../Moduler/payment/payment.router';
+import { prescriptionRouter } from '../Moduler/prescription/prescription.router';
 
 const router = express.Router()
 
@@ -52,6 +53,10 @@ const moduleRouters = [
     {
         path: '/payment',
         route: paymentRouter
+    },
+    {
+        path: '/prescription',
+        route: prescriptionRouter
     }
 ]
 
