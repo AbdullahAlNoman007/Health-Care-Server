@@ -1,8 +1,10 @@
-import { Prisma } from "@prisma/client";
+import { AppointmentStatus, Prisma } from "@prisma/client";
 import { TdecodedData } from "../../interface";
 import calculatePagination from "../../utility/pagination";
 import prisma from "../../utility/prismaClient";
 import { v4 as uuidv4 } from 'uuid';
+import AppError from "../../Error/AppError";
+import httpStatus from "http-status";
 
 interface Tappointment {
     doctorId: string;
@@ -186,8 +188,55 @@ const getAppointment = async (params: TgetAppointment, options: any) => {
 
 }
 
+const changeAppointmentStatus = async (appointmentId: string, statusData: { status: AppointmentStatus }, user: TdecodedData) => {
+
+    const appointmentData = await prisma.appointment.findUniqueOrThrow({
+        where: {
+            id: appointmentId
+        },
+        include: {
+            doctor: true
+        }
+    })
+
+    if (user.role === 'DOCTOR') {
+        if (appointmentData.doctor.email !== user.email) {
+            throw new AppError(httpStatus.BAD_REQUEST, "You can't change other doctor appoinment")
+        }
+    }
+
+
+    if (Object.keys(statusData).length === 0) {
+        throw new AppError(httpStatus.BAD_REQUEST, "Provide the new status")
+    }
+    if (appointmentData.status === 'CANCELED') {
+        throw new AppError(httpStatus.BAD_REQUEST, "Canceled Appointment can't be updated")
+    }
+    if (appointmentData.status === 'COMPLETED') {
+        throw new AppError(httpStatus.BAD_REQUEST, "The Appointment is Completed")
+    }
+    if (appointmentData.status === 'SCHEDULED' && statusData.status === 'COMPLETED') {
+        throw new AppError(httpStatus.BAD_REQUEST, "Scheduled Appointment can't be directly updated to Completed")
+    }
+    if (appointmentData.status === 'INPROGRESS' && statusData.status === 'SCHEDULED') {
+        throw new AppError(httpStatus.BAD_REQUEST, "In-progress Appointment can't be updated to SCHEDULED")
+    }
+
+
+    const result = await prisma.appointment.update({
+        where: {
+            id: appointmentId
+        },
+        data: {
+            status: statusData?.status
+        }
+    })
+    return result
+}
+
 export const appointmentService = {
     createAppointment,
     getMyAppointment,
-    getAppointment
+    getAppointment,
+    changeAppointmentStatus
 }
