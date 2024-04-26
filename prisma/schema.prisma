@@ -61,6 +61,7 @@ model Doctor {
   DoctorSchedules     DoctorSchedules[]
   Appointment         Appointment[]
   Prescription        Prescription[]
+  Review              Review[]
 
   @@map("doctors")
 }
@@ -80,6 +81,7 @@ model Patient {
   MedicalReport     MedicalReport[]
   Appointment       Appointment[]
   Prescription      Prescription[]
+  Review            Review[]
 
   @@map("patients")
 }
@@ -182,6 +184,7 @@ model Appointment {
   DoctorSchedules DoctorSchedules?
   Payment         Payment?
   Prescription    Prescription?
+  Review          Review?
 
   @@unique([doctorId, scheduleId])
 }
@@ -212,6 +215,24 @@ model Prescription {
   followUpDate String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+}
+
+model Review {
+  id String @id @default(uuid())
+
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id])
+
+  doctorId String
+  doctor   Doctor @relation(fields: [doctorId], references: [id])
+
+  appointmentId String      @unique
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+
+  rating    Float
+  comment   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum AppointmentStatus {

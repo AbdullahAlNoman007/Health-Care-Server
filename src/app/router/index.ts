@@ -10,6 +10,7 @@ import { doctorScheduleRouter } from '../Moduler/doctorSchedule/doctorSchedule.r
 import { appointmentRouter } from '../Moduler/Appointment/Appointment.router';
 import { paymentRouter } from '../Moduler/payment/payment.router';
 import { prescriptionRouter } from '../Moduler/prescription/prescription.router';
+import { reviewRouter } from '../Moduler/review/review.router';
 
 const router = express.Router()
 
@@ -57,7 +58,11 @@ const moduleRouters = [
     {
         path: '/prescription',
         route: prescriptionRouter
-    }
+    },
+    {
+        path: '/review',
+        route: reviewRouter
+    },
 ]
 
 moduleRouters?.map(route => router.use(route.path, route.route))
