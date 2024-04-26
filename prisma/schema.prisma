@@ -187,6 +187,7 @@ model Appointment {
   Review          Review?
 
   @@unique([doctorId, scheduleId])
+  @@map("appoinments")
 }
 
 model Payment {
